@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudGuard AI | Advanced Transaction Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        button.primary-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 1rem;
+        }
+
+        button.primary-btn:hover {
+            opacity: 0.9;
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-box.safe {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .result-box.fraud {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .result-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loader {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .drop-zone input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-table th {
+            color: var(--text-muted);
+        }
+
+        .tag.fraud {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .tag.safe {
+            color: var(--success);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="hero-text">
+            <h1>Secure Your<br>Transactions</h1>
+            <p>Advanced AI-powered fraud detection system using Gradient Boosting to analyze patterns and protect your
+                financial data in real-time.</p>
+
+            <div style="display: flex; gap: 1rem;">
+                <div
+                    style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; width: fit-content;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">99.9%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Accuracy Rate</div>
+                </div>
+                <div
+                    style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; width: fit-content;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--secondary);">24/7</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Real-time Monitor</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('single')">Single Check</div>
+                <div class="tab" onclick="switchTab('batch')">Batch Upload</div>
+            </div>
+
+            <!-- Single Transaction Form -->
+            <div id="single" class="tab-content active">
+                <form id="fraudForm">
+                    <div class="form-group">
+                        <label>Transaction Method</label>
+                        <select id="transaction_method" required>
+                            <option value="1">Online Transfer</option>
+                            <option value="2">ATM Withdrawal</option>
+                            <option value="3">POS Terminal</option>
+                            <option value="4">Debit Card</option>
+                            <option value="5">Wire Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transaction Type</label>
+                        <select id="transaction_type" required>
+                            <option value="1">Payment</option>
+                            <option value="2">Transfer</option>
+                            <option value="3">Cash Out</option>
+                            <option value="4">Debit</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="amount" placeholder="e.g. 5000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Old Balance ($)</label>
+                        <input type="number" id="old_balance" placeholder="e.g. 10000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>New Balance ($)</label>
+                        <input type="number" id="new_balance" placeholder="e.g. 5000" required>
+                    </div>
+
+                    <button type="submit" class="primary-btn">
+                        <span id="btnText">Analyze Transaction</span>
+                        <div class="loader" id="loader"></div>
+                    </button>
+                </form>
+
+                <div id="resultBox" class="result-box">
+                    <div class="result-icon" id="resultIcon"></div>
+                    <div class="status-text" id="statusText"></div>
+                    <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Analysis Complete</div>
+                </div>
+            </div>
+
+            <!-- Batch Upload Form -->
+            <div id="batch" class="tab-content">
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept=".csv, .xlsx, .xls, .pdf">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">📄</div>
+                    <p>Drag & drop Bank Statement (PDF/CSV/Excel)</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">or click to browse</p>
+                </div>
+
+                <button onclick="uploadFile()" class="primary-btn" id="uploadBtn">
+                    <span id="uploadBtnText">Analyze File</span>
+                    <div class="loader" id="uploadLoader"></div>
+                </button>
+
+                <div id="batchResult" style="margin-top: 1.5rem; display: none;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                        <span style="color: var(--text-muted)">Total: <b style="color: white"
+                                id="totalCount">0</b></span>
+                        <span style="color: var(--danger)">Fraud Detected: <b id="fraudCount">0</b></span>
+                    </div>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Amount</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batchTableBody">
+                                <!-- JS will populate -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tabName === 'single') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('single').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('batch').classList.add('active');
+            }
+        }
+
+        // Single Predict
+        document.getElementById('fraudForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.querySelector('#fraudForm button');
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('loader');
+            const resultBox = document.getElementById('resultBox');
+
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            const data = {
+                transaction_method: parseInt(document.getElementById('transaction_method').value),
+                transaction_type: parseInt(document.getElementById('transaction_type').value),
+                amount: parseFloat(document.getElementById('amount').value),
+                old_balance: parseFloat(document.getElementById('old_balance').value),
+                new_balance: parseFloat(document.getElementById('new_balance').value)
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                setTimeout(() => {
+                    resultBox.style.display = 'block';
+                    resultBox.className = 'result-box ' + (result.prediction === 'Fraud' ? 'fraud' : 'safe');
+
+                    document.getElementById('resultIcon').textContent = result.prediction === 'Fraud' ? '⚠️' : '🛡️';
+                    document.getElementById('statusText').textContent = result.prediction === 'Fraud' ? 'Fraud Detected' : 'Transaction Safe';
+
+                    btn.disabled = false;
+                    btnText.style.display = 'block';
+                    loader.style.display = 'none';
+                }, 600);
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during single analysis.');
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        });
+
+        // Batch Upload
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            const btn = document.getElementById('uploadBtn');
+            const btnText = document.getElementById('uploadBtnText');
+            const loader = document.getElementById('uploadLoader');
+            const resultsDiv = document.getElementById('batchResult');
+
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            resultsDiv.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('totalCount').textContent = result.total_transactions;
+                    document.getElementById('fraudCount').textContent = result.fraud_detected;
+
+                    const tbody = document.getElementById('batchTableBody');
+                    tbody.innerHTML = '';
+
+                    result.results.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.transaction_method || '-'}</td>
+                            <td>$${row.amount}</td>
+                            <td class="tag ${row.prediction === 'Fraud' ? 'fraud' : 'safe'}">${row.prediction}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    resultsDiv.style.display = 'block';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to upload/analyze file.');
+            } finally {
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        }
+
+        // Drag & Drop visual feedback
+        const dropZone = document.getElementById('dropZone');
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                dropZone.querySelector('p').textContent = "Selected: " + this.files[0].name;
+            }
+        });
+    </script>
+</body>
+
+</html>
